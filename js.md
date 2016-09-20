@@ -14,30 +14,28 @@ Technically, the actual prototype used to go up the chain is ```__proto__	``` (w
 
 There are a couple of ways of creating an object that inherits from another (through its `__proto__`). The faster one is `var redCar = new Car()` and the more modern `var redCar = Object.create(Car.prototype)`. These two acheive almost the same effect, by setting the `__proto__` to `Car.prototype`.
 
-**Note**
-
-```javascript 
-function Pet(color) {
-    this.color = color;
-}
-var myPet = new Pet();
-myPet.__proto__ == myPet.prototype //true
-myPet.__proto__.__proto__ == Object.prototype //true
-myPet instanceof Point; //true
-myPet instanceof Object; //true
-```
-
-So
+**Note:**  ```__proto__	``` is **not** the same as `.prototype` which is available only on Functions (Constructors). And is the object assigned to proto and shared by all instances. So:
 
 ```javascript 
 var o = {};
-o.__proto__ // -> Object.prototype
-var myCat = new Cat();
-myCat.__proto__ // -> Cat.prototype
+o.__proto__ // Object.prototype, all objects inherit from it.
+
 Cat = function(){} 
-Cat.__proto__ // -> Function.prototype
+Cat.__proto__ // Function.prototype all functions inherit from it.
+
+var myCat = new Cat();
+myCat.__proto__ // Cat.prototype
+myCat.__proto__.__proto__ // Object.prototype
+
 Cat.prototype.meow // -> function to meow available to cat instances
+myCat.meow // Same as Cat.prototype.meow
+myCat.__proto__.meow // Same as myCat.meow
+
+myCat instanceof Cat; //true
+myCat instanceof Object; //true
 ```
+
+
 
 ### Constructors
 
@@ -511,8 +509,8 @@ newObject = object(oldObject)
 - join: outputs a single string
 - pop + push
 - slice sort .
-- delete will leave an undefined hole in the middle use **splice** instead.
-- splice(a,b) starting at a delete b number of stuff.
+-delete will leave an undefined hole in the middle use **splice** instead.
+-splice(a,b) starting at a delete b number of stuff.
 
 **splice**
 
@@ -523,13 +521,13 @@ myarr=['a','b','c','d'];
 
 ## Functions
 
-- First class objects.
-- work like any other value
-- inherit from object, can store name value pairs
-- Called lambda in other languages.
-- It is secure.
-- **Static Scoping** Inner functions have access to the params of the functions it is contained in.
-- **closure** The variable still have access to the parents values, even if the parent doesn't exist anymore (has returned); has access to it, IS NOT A COPY.
+-First class objects.
+-work like any other value
+-inherit from object, can store name value pairs
+-Called lambda in other languages.
+-It is secure.
+-**Static Scoping** Inner functions have access to the params of the functions it is contained in.
+-**closure** The variable still have access to the parents values, even if the parent doesn't exist anymore (has returned); has access to it, IS NOT A COPY.
 
 Each function has it's own scope. Are local vars to the function. (meaning that multiple calls to the same method will not mess with each other.)
 
@@ -539,7 +537,7 @@ Each function has it's own scope. Are local vars to the function. (meaning that 
 
 ### Function Invocation.
 
-- 'this' is bound at invocation time.
+-'this' is bound at invocation time.
 
 **Function Form**
 
@@ -547,10 +545,10 @@ Each function has it's own scope. Are local vars to the function. (meaning that 
 functionObject(args)
 ```
 
-- this is set to the global obj.
-- not very useful
-- makes it harder to write helper functions within a method because it doesn't have access to outer this.
-- use *var that = this; *in the inner.
+-this is set to the global obj.
+-not very useful
+-makes it harder to write helper functions within a method because it doesn't have access to outer this.
+-use *var that = this; *in the inner.
 
 **Method Form**
 
@@ -559,7 +557,7 @@ functionObject(args)
   thisObject["MethodName"](args)
 ```
 
-- this on the function will be a reference to thisObject
+-this on the function will be a reference to thisObject
 
 **Constructor Form**
 
@@ -567,8 +565,8 @@ functionObject(args)
 new functionObject(args)
 ```
 
-- A new object is created and assigned to this. 
-- if no return is especified, this will be returned.
+-A new object is created and assigned to this. 
+-if no return is especified, this will be returned.
 
 **Apply Form**
 
@@ -576,14 +574,14 @@ new functionObject(args)
 functionObject.aply(thisObject, [args])
 ```
 
-- ```
+-```
 
-  ```
+```
 
 #### Invocation: Arguments
 
-- functions also receive a parameter called arguments
-- contains invocation args in an array-like object with length.
+-functions also receive a parameter called arguments
+-contains invocation args in an array-like object with length.
 
 ```js
 function sum(){
@@ -595,7 +593,7 @@ function sum(){
 
 ## Augmenting Built in types.
 
-- For example add **trim** to string
+-For example add **trim** to string
 
 ```js
   String.prototype.trim = function () {
@@ -642,34 +640,34 @@ undefined='undefined'
 
 ## eval DONT USE Unless you can absolutely trust JSON.
 
-- Compiles and returns the result
-- Is what the browser uses to convert strings into actions.
+-Compiles and returns the result
+-Is what the browser uses to convert strings into actions.
 
 ```js
 eval(string)
 ```
 
-- same as New function Functtion
+-same as New function Functtion
 
 ## (global) Object
 
-- container for global vars and all built in objects
-- On browsers window is the global.
-- sometimes 'this' points to it. *var global = this;*
+-container for global vars and all built in objects
+-On browsers window is the global.
+-sometimes 'this' points to it. *var global = this;*
 
 **this is evil**
 
-- Functions and vars can crash with each other.
-- try to reduce its use
-- vars without var are global.
-- Create ONE global object and place everything there.
+-Functions and vars can crash with each other.
+-try to reduce its use
+-vars without var are global.
+-Create ONE global object and place everything there.
 
 ## Encapsulation
 
-- Has no leakage
-- Only shows what we want to return.
-- Uses closures
-- makes all vars private.
+-Has no leakage
+-Only shows what we want to return.
+-Uses closures
+-makes all vars private.
 
 ```js
 YAHOO.Trivia = function () {
@@ -689,9 +687,9 @@ var trivia = YAHOO.Trivia();
 
 ## inheritance.
 
-- Object oriented code reduce
-- two schools: Classical(JAva) Prototypal(JS)
-- Objects inherit fro object with a secret link to another object.
+-Object oriented code reduce
+-two schools: Classical(JAva) Prototypal(JS)
+-Objects inherit fro object with a secret link to another object.
 
 ## DOM STUF WITH JS~~~
 
@@ -766,7 +764,7 @@ Invocation: Every call receives 'this' and args.
 
 ### Method Invocation
 
-- When a function is stored as a property of an object, we call it a method. When a method is invoked, this is bound to that object. (when invocation contains a dot . )
+-When a function is stored as a property of an object, we call it a method. When a method is invoked, this is bound to that object. (when invocation contains a dot . )
 
 ```js
      var myObject = {
@@ -780,7 +778,7 @@ myObject.increment(2);// myObject.value => 3
 
 ### The Function Invocation
 
-- When a function is not the property of an object, then it is invoked as a function:
+-When a function is not the property of an object, then it is invoked as a function:
 
 ```js
 var sum = add(3, 4);    // sum is 7
@@ -803,10 +801,10 @@ myObject.value(); // 6
 
 ### The Constructor Invocation Pattern **DO NOT USE THIS (new)**
 
-- If a function is invoked with the *new* prefix, then a new object will be created with a hidden link to the value of the function’s prototype member, and this will be bound to that new object.
-- Functions intended to use **new** prefix are called constructors.
-- By convention, they are kept in variables with a capitalized name.
-- *new* returns a new object with a pointer to the constructor's prototype
+-If a function is invoked with the *new* prefix, then a new object will be created with a hidden link to the value of the function’s prototype member, and this will be bound to that new object.
+-Functions intended to use **new** prefix are called constructors.
+-By convention, they are kept in variables with a capitalized name.
+-*new* returns a new object with a pointer to the constructor's prototype
 
 ```js
 // Create a constructor function called Quo. It makes an object with a status property.
@@ -850,8 +848,8 @@ A function always returns a value. If no return specified, it returns udefined.
 
 ### Public methods
 
-- method that uses this to access an object
-- can be reused with many 'classes'
+-method that uses this to access an object
+-can be reused with many 'classes'
 
 ```js
 function(string) { //can be used with any object
@@ -861,14 +859,14 @@ function(string) { //can be used with any object
 
 ### MOdule
 
-- Varuables defined in a module are only visible in the module
-- FUnctions can be used to contain modules
+-Varuables defined in a module are only visible in the module
+-FUnctions can be used to contain modules
 
 ### Singletons
 
-- Objects instantiated *once*
-- can be created with object notation
-- Another way of writing a singleton.(using closures)
+-Objects instantiated *once*
+-can be created with object notation
+-Another way of writing a singleton.(using closures)
 
 ```js
 var singleton = function(){
@@ -887,7 +885,7 @@ singleton.firstmethod(1,2);
 
 ### Power Constructor
 
-- using a singleton module pattern in a constructor and we have a power constructor
+-using a singleton module pattern in a constructor and we have a power constructor
 
 ```js
 function powerConstructor(){
@@ -1210,8 +1208,8 @@ cool guy tutorial videos: https://www.youtube.com/playlist?list=PL0zVEGEvSaeEd9h
 
 # Books
 
-- Programming Javascript applications - Eric Elliot
-- You Don't Know JS: Up & Going - Kyle Simpson
+-Programming Javascript applications - Eric Elliot
+-You Don't Know JS: Up & Going - Kyle Simpson
 
 # jsconf
 
