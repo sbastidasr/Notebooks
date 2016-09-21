@@ -121,7 +121,7 @@ Adding the methods via `Foo.prototype.run = function(){ console.log("run!") }  `
 
 
 
-### Object.create()    [Personal favorite]
+### Object.create()    [Personal favorite, when possible]
 
 `Object.create` builds an object that inherits directly from the object passed as its first argument. Meaning that to create an object based on a Constructor prototype, you would do `Object.create(Car.prototype)` which is the same as  ```var redCar = new Car();```  You can create an object that doesn't inherit from anything with `Object.create(null);`
 
@@ -176,9 +176,30 @@ var zack = Object.create(person, {age: {value:  13} });
 console.log(zack.age); // => ‘13’
 ```
 
+**Creating with additional properties** 
+
+`Object.create` takes an additional map of property descriptors. It adds the new properties to the newly created instance. 
+
+```
+var myCat = Object.create(Pet.prototype, {
+        name: {
+                value: "Catename", 
+                writable: true, 
+                configurable: true, 
+                enumerable: true
+            },
+            age: {
+                value: 10, 
+                writable: true, 
+                configurable: true, 
+                enumerable: true
+            }
+});
+```
 
 
-### Multi-level Inheritance
+
+### Multi-level Inheritance with new
 
 ```javascript
 // 1. level constructor
@@ -194,7 +215,7 @@ var TrainedDog = function ( name, level ) {
 };
 
 // set up two-level inheritance
-TrainedDog.prototype = Object.create( Dog.prototype );
+TrainedDog.prototype = Object.create( Dog.prototype ); // Inherit from prototype to get all Dog's methods
 TrainedDog.prototype.constructor = TrainedDog;
 TrainedDog.prototype.rollOver = function () { /* ... */ }; // Extra candy
 
@@ -203,13 +224,38 @@ var dog1 = new Dog( 'Rex' );
 var dog2 = new TrainedDog( 'Rock', 3 );
 ```
 
+### Multi-level Inheritance with Object.create
 
+Multi-level inheritance can also be done through Object.create(), although a bit less powerful because constructos are not run.
+
+```javascript
+const Musician = {
+    solo : function(length) {
+      var solo = "";
+      for (var i=0; i<length; i++) {
+          solo += this.sounds[i % this.sounds.length] + " ";
+      }
+      console.log(solo);
+  }
+};
+
+var Guitarist = Object.create(Musician, { strings: { value: 6 } } )
+Guitarist.sounds = ['Twang', 'Thrumb', 'Bling'],
+Guitarist.tune = function() {
+    console.log('Be with you in a moment, tuning');
+};
+
+var nigel = Object.create(Guitarist)
+nigel.solo(5); // "Twang Thrumb Bling Twang Thrumb "
+console.log(nigel.strings) // 6
+nigel.tune(); // "Be with you in a moment, tuning"
+```
 
 
 
 ### Factory functions
 
-Function that returns an object. consts are encapsulated by closure. And only talk is available, and it has aceess to sound
+Functions that return an object. consts are encapsulated by closure. Only talk is available, and it has access to sound. Sound is not available. 
 
 ```js
 const dog = () => {
@@ -224,9 +270,24 @@ sniffles.talk() // Outputs: "woof"
 
 ### 
 
+###Looping through Objects
+
+```javascript
+var user = {
+  name:"Brendan Eich",
+  profession:"programmer",
+  invented:"JavaScript"
+};
+for(var prop in user){
+   console.log(user[prop]); // Brendan Eich programmer JavaScript
+}
+```
 
 
 
+
+
+# NOT YET DONE 
 
 ### This
 
@@ -273,29 +334,6 @@ Ways of instantiating an object:
 - Better performance
 - Less memory
 - Class: instanciate with new (fast but dont use because this is not correctly bound)
-
-### Looping through Objects
-
-```javascript
-var user = {
-  name:"Brendan Eich",
-  profession:"programmer",
-  invented:"JavaScript"
-};
-for(var prop in user){
-   console.log(user[prop]); // Brendan Eich programmer JavaScript
-}
-```
-
-
-
-
-
-
-
-
-
-
 
 
 
