@@ -8,7 +8,7 @@
 
 ### Prototype
 
-JS uses protoypal inheritance. Lets say you have a constructor ```Car``` and its instance ```redCar```. The prototype is a field of the instance ( `redCar`) that points to another object. If you try to look for a key in ```redCar``` and it is not found, it will look for it in its prototype, and on the prototype's prototype. Until it finds it or returns undefined. That is why its called the *Prototype Chain*.
+JS uses protoypyal inheritance. Lets say you have a constructor ```Car``` and its instance ```redCar```. The prototype is a field of the instance ( `redCar`) that points to another object. When calling a variable or function objects look up on themselves, if not available, it looks through the protototype. If you try to look for a key in ```redCar``` and it is not found, it will look for it in its prototype, and on the prototype's prototype. Until it finds it or returns undefined. That is why its called the *Prototype Chain*. *A prototype is a property that all Javascript objects have, that stores all methods that objects of that class share.*
 
 Technically, the actual prototype used to go up the chain is ```__proto__	``` (which is a pointer to an object) but it shouldn't be used for performance issues. To get the prototype, we use ```var b = Object.getPrototypeOf(a)``` .
 
@@ -37,77 +37,105 @@ myCat instanceof Object; //true
 
 
 
+**New / updated ** properties on an instance are assigned to the object, not to the prototype
+
+```javascript
+var person = { kind: 'person' }
+var zack = {}
+zack.__proto__ = person
+zack.kind = 'zack'
+console.log(zack.kind); //=> 'zack'
+console.log(person.kind); //=> 'person',not modified
+```
+
+
+
 ### Constructors
 
-```javascript 
-myCat.constructor = Cat; // Function used to construct the myCat instance.
-//same as myCat.__proto__.constructor
-
-```
-
-
+Constructors in JS are the most used way to do prototype chains. Constructors are Functions, which are highly optimized on JS engines. Constructors on JS are **not** classes!
 
 ```javascript 
-var test = new Bar();
-var test2 = new Bar();
-// all Bar instances share the same 
+var Pet() = function(){}
 ```
 
-It is important to note that new Bar() does not create a new Foo instance, but reuses the one assigned to its prototype; thus, all Bar instances will share the same value property.
+**Note** Don't forget to use `new` when creating objects with constructors, otherwise, its properties will be assigned to the global object when using `this` 
+
+#### Constructor Property
+
+Functions have an automatically created `prototype` property. When the interpreter creates a `prototype` of a function, it makes a new object and a `constructor` property that references the function. For example: `Pet.prototype.constructor == Pet // true`
+
+All instances inherit a constructor property from their prototype via `__proto__` 
+
+```javascript
+var Pet() = function(){}
+Pet.prototype.constructor // => Pet(){} Created by default.
+var cat = new Pet()
+cat.constructor // Pet(){} function used to build cat 
+cat.__proto__.constructor // Pet(){} the property is actually in __proto__
+```
+
+The `constructor` property is assigned to function `prototype`. Then the interpreter forgets about it. You have to manually keep it from being overwritten if changing the prototype.
+
+The constructor property serves three purposes:
+
+1. Get the class of an object. (Functions considered classes). Now you can check if both objects are built with the same constructor.
+2. Create a new instance: Given an object, you can create a new instance that has the same class.
+3. Invoking a super-constructor.
 
 
 
-### New
+### New 
 
-Creates a new object and assigns the __proto__ to the function's prototype. Returns the object or a value of running the constructor function, with additionally running the constructor and getting its return vale. 
+Creates a new object (instance) from a **Constructor** and assigns the instance's  __proto__ to the function's prototype. Returns the object or a value of running the constructor function.
 
-`new Test()`:
+`var doge = new Pet()`
 
-1. create `new Object()` obj
-2. set `obj.__proto__` to `Test.prototype`
-3. `return Test.call(obj) || obj;// normally obj is returned but constructors in JS can return a value`
+1. Creates a new object doing: `var doge = new Object()` 
+2. Sets `doge.__proto__` to `Pet.prototype`
+3. `return Pet.call(doge) || doge; // normally doge is returned but constructors can also return a value`
 
 ```javascript
 function Foo() {
-    //does run!
-    console.log("This runs!");
-    this.petProperty="cat";
-    this.catFunction = function(){ return "cate" }
+    console.log("This runs!"); // does run!
+    this.petProperty="cat"; // instance property
+    this.catFunction = function(){ return "cate"} // Created for each instance
 }
-Foo.prototype.protoPetProperty = 'dog';
+Foo.prototype.protoPetProperty = 'dog'; // One function, shared by all instances.
 
 var foo = new Foo();
 console.log(foo.petProperty) //"cat"
-console.log(foo.__proto__.protoPetProperty) // "dog"
 console.log(foo.protoPetProperty) // "dog"
+console.log(foo.__proto__.protoPetProperty) // "dog", same as above
 console.log(foo.catFunction()) //"cate"
+
+Foo.isPrototypeOf(foo);// true
 ```
 
-### Object.create()
 
-`Object.create` builds an object that inherits directly from the one passed as its first argument. Meaning that ```Object.create(Car.prototype)``` is the same as  ```var redCar = new Car();``` 
 
-You can create an object that doesn't inherit from anything with `Object.create(null);`
+**Properties on the constructor or on the Prototype?**
 
-```Object.create( Test.prototype )```
+When adding properties or methods to objects, there are two ways to do it. All properties inside the constructor, in this case `Foo(){ // properties }` are instance specific. Each instance has a separate version of the method. 
 
-1. create `new Object()` obj
-2. set `obj.__proto__` to `Test.prototype`
-3. `return obj;`
+Adding the methods via `Foo.prototype.run = function(){ console.log("run!") }  ` adds the method to the prototype and thus, is shared by all instances. This occupies less memory and is faster. 
 
-So basically `Object.create` doesn't execute the constructor, but still does prototypal inheritance.
 
-```
-var b = Object.create(a);
-a.isPrototypeOf(b);// true
-```
 
-but
+### Object.create()    [Personal favorite]
+
+`Object.create` builds an object that inherits directly from the object passed as its first argument. Meaning that to create an object based on a Constructor prototype, you would do `Object.create(Car.prototype)` which is the same as  ```var redCar = new Car();```  You can create an object that doesn't inherit from anything with `Object.create(null);`
+
+`var doge = Object.create( Pet.prototype )`
+
+1. Creates a new object doing `var doge = new Object()` 
+2. Sets `doge.__proto__` to `Pet.prototype`
+3. `returns doge;`
+
+So basically `Object.create()` doesn't execute the constructor, but still does prototypal inheritance.
 
 ```javascript 
 function Foo() {
-    //does not run!
-    console.log("This runs!");
+    console.log("This doesn't run!"); //does not run!
     this.petProperty="cat";
     this.catFunction = function(){ return "cate" }
 }
@@ -118,55 +146,62 @@ console.log(foo.petProperty) //undefined
 console.log(foo.protoPetProperty) // "dog"
 console.log(foo.__proto__.protoPetProperty) // "dog"
 console.log(foo.catFunction()) //"error"
+
+Foo.prototype.isPrototypeOf(foo);// true
+```
+
+**Example using Object.Create to create with prototype  (ES6)**
+
+```js
+const Food = {
+  name:"BaseFood",
+  init: function (type) {
+    this.type = type
+  },
+  eat: function () {
+    console.log('You ate the ' + this.type)
+  }
+}
+const waffle = Object.create(Food)
+waffle.init('waffle')
+waffle.eat() // Output: "You ate the waffle"
+Food.isPrototypeOf(waffle)//true
+console.log(waffle.name) // Falls back to the prototypes name = "BaseFood";
+waffle.name="waffle"
+console.log(waffle.name) // now it has its name: "waffle";
+```
+
+```javascript
+var zack = Object.create(person, {age: {value:  13} });
+console.log(zack.age); // => ‘13’
 ```
 
 
 
-### Looping through Objects
+### Multi-level Inheritance
 
 ```javascript
-var user = {
-  name:"Brendan Eich",
-  profession:"programmer",
-  invented:"JavaScript"
+// 1. level constructor
+var Dog = function ( name ) {
+    this.name = name;
 };
-for(var prop in user){
-   console.log(user[prop]); // Brendan Eich programmer JavaScript
-}
+Dog.prototype.bark = function () { /* ... */ };
+
+// 2. level constructor
+var TrainedDog = function ( name, level ) {
+    Dog.apply( this, arguments ); // calling the super constructor
+    this.level = level;
+};
+
+// set up two-level inheritance
+TrainedDog.prototype = Object.create( Dog.prototype );
+TrainedDog.prototype.constructor = TrainedDog;
+TrainedDog.prototype.rollOver = function () { /* ... */ }; // Extra candy
+
+// instances
+var dog1 = new Dog( 'Rex' );
+var dog2 = new TrainedDog( 'Rock', 3 );
 ```
-
-## Instantiating objects
-
-From classes (Capitalized Objects)
-
-```javascript
-var Car = {
-    doors:4,
-    tires:4,
-    paintColor:'white'
-}
-```
-
-### Object.create()
-
-```
-var Human = {
-    legs:2,
-    eyes:2
-}
-var alien = Object.create(Human);
-
-alien.eyes = 4
-
-var spaceMan = Object.create(alien);
-
-spaceMan.legs // 2
-spaceMan.eyes // 4
-```
-
-When calling a variable or function objects look up on themselves, if not available, it looks through the protototype. The object does not contain the properties from the constructor. It only has a link.
-
-*A prototype is a property that all Javascript objects have, that stores all methods that objects of that class share.*
 
 
 
@@ -174,7 +209,20 @@ When calling a variable or function objects look up on themselves, if not availa
 
 ### Factory functions
 
-### Constructor functions
+Function that returns an object. consts are encapsulated by closure. And only talk is available, and it has aceess to sound
+
+```js
+const dog = () => {
+  const sound = 'woof'
+  return {
+    talk: () => console.log(sound)
+  }
+}
+const sniffles = dog()
+sniffles.talk() // Outputs: "woof"
+```
+
+### 
 
 
 
@@ -192,6 +240,12 @@ var alien {
     } 
 // Returs Hi, my name is: Mark
 ```
+
+
+
+**
+
+
 
 
 
@@ -220,43 +274,32 @@ Ways of instantiating an object:
 - Less memory
 - Class: instanciate with new (fast but dont use because this is not correctly bound)
 
-**Factories**
+### Looping through Objects
 
-Function that returns an object. consts are encapsulated by closure. And only talk is available, and it has aceess to sound
-
-```js
-const dog = () => {
-  const sound = 'woof'
-  return {
-    talk: () => console.log(sound)
-  }
+```javascript
+var user = {
+  name:"Brendan Eich",
+  profession:"programmer",
+  invented:"JavaScript"
+};
+for(var prop in user){
+   console.log(user[prop]); // Brendan Eich programmer JavaScript
 }
-const sniffles = dog()
-sniffles.talk() // Outputs: "woof"
 ```
 
-**Using Object.Create to create with prototype**
 
-```js
-const food = {
-  init: function (type) {
-    this.type = type
-  },
-  eat: function () {
-    console.log('You ate the ' + this.type)
-  }
-}
-food.name="BaseFood";
-const waffle = Object.create(food)
-waffle.init('waffle')
-waffle.eat() // Output: "You ate the waffle"
-food.isPrototypeOf(waffle)//true
-console.log(waffle.name) // Falls back to the prototypes name = "BaseFood";
-waffle.name="waffle"
-console.log(waffle.name) // now it has its name: "waffle";
-```
 
-**JSON**
+
+
+
+
+
+
+
+
+
+
+## JSON**
 
 ```js
 var string = JSON.stringify({name: "X", born: 1980});
@@ -509,8 +552,8 @@ newObject = object(oldObject)
 - join: outputs a single string
 - pop + push
 - slice sort .
--delete will leave an undefined hole in the middle use **splice** instead.
--splice(a,b) starting at a delete b number of stuff.
+- delete will leave an undefined hole in the middle use **splice** instead.
+- splice(a,b) starting at a delete b number of stuff.
 
 **splice**
 
@@ -521,13 +564,13 @@ myarr=['a','b','c','d'];
 
 ## Functions
 
--First class objects.
--work like any other value
--inherit from object, can store name value pairs
--Called lambda in other languages.
--It is secure.
--**Static Scoping** Inner functions have access to the params of the functions it is contained in.
--**closure** The variable still have access to the parents values, even if the parent doesn't exist anymore (has returned); has access to it, IS NOT A COPY.
+- First class objects.
+- work like any other value
+- inherit from object, can store name value pairs
+- Called lambda in other languages.
+- It is secure.
+- **Static Scoping** Inner functions have access to the params of the functions it is contained in.
+- **closure** The variable still have access to the parents values, even if the parent doesn't exist anymore (has returned); has access to it, IS NOT A COPY.
 
 Each function has it's own scope. Are local vars to the function. (meaning that multiple calls to the same method will not mess with each other.)
 
@@ -537,7 +580,7 @@ Each function has it's own scope. Are local vars to the function. (meaning that 
 
 ### Function Invocation.
 
--'this' is bound at invocation time.
+- 'this' is bound at invocation time.
 
 **Function Form**
 
@@ -545,10 +588,10 @@ Each function has it's own scope. Are local vars to the function. (meaning that 
 functionObject(args)
 ```
 
--this is set to the global obj.
--not very useful
--makes it harder to write helper functions within a method because it doesn't have access to outer this.
--use *var that = this; *in the inner.
+- this is set to the global obj.
+- not very useful
+- makes it harder to write helper functions within a method because it doesn't have access to outer this.
+- use *var that = this; *in the inner.
 
 **Method Form**
 
@@ -557,7 +600,7 @@ functionObject(args)
   thisObject["MethodName"](args)
 ```
 
--this on the function will be a reference to thisObject
+- this on the function will be a reference to thisObject
 
 **Constructor Form**
 
@@ -565,8 +608,8 @@ functionObject(args)
 new functionObject(args)
 ```
 
--A new object is created and assigned to this. 
--if no return is especified, this will be returned.
+- A new object is created and assigned to this. 
+- if no return is especified, this will be returned.
 
 **Apply Form**
 
@@ -574,14 +617,14 @@ new functionObject(args)
 functionObject.aply(thisObject, [args])
 ```
 
--```
+- ```
 
-```
+  ```
 
 #### Invocation: Arguments
 
--functions also receive a parameter called arguments
--contains invocation args in an array-like object with length.
+- functions also receive a parameter called arguments
+- contains invocation args in an array-like object with length.
 
 ```js
 function sum(){
@@ -593,7 +636,7 @@ function sum(){
 
 ## Augmenting Built in types.
 
--For example add **trim** to string
+- For example add **trim** to string
 
 ```js
   String.prototype.trim = function () {
@@ -640,34 +683,34 @@ undefined='undefined'
 
 ## eval DONT USE Unless you can absolutely trust JSON.
 
--Compiles and returns the result
--Is what the browser uses to convert strings into actions.
+- Compiles and returns the result
+- Is what the browser uses to convert strings into actions.
 
 ```js
 eval(string)
 ```
 
--same as New function Functtion
+- same as New function Functtion
 
 ## (global) Object
 
--container for global vars and all built in objects
--On browsers window is the global.
--sometimes 'this' points to it. *var global = this;*
+- container for global vars and all built in objects
+- On browsers window is the global.
+- sometimes 'this' points to it. *var global = this;*
 
 **this is evil**
 
--Functions and vars can crash with each other.
--try to reduce its use
--vars without var are global.
--Create ONE global object and place everything there.
+- Functions and vars can crash with each other.
+- try to reduce its use
+- vars without var are global.
+- Create ONE global object and place everything there.
 
 ## Encapsulation
 
--Has no leakage
--Only shows what we want to return.
--Uses closures
--makes all vars private.
+- Has no leakage
+- Only shows what we want to return.
+- Uses closures
+- makes all vars private.
 
 ```js
 YAHOO.Trivia = function () {
@@ -687,9 +730,9 @@ var trivia = YAHOO.Trivia();
 
 ## inheritance.
 
--Object oriented code reduce
--two schools: Classical(JAva) Prototypal(JS)
--Objects inherit fro object with a secret link to another object.
+- Object oriented code reduce
+- two schools: Classical(JAva) Prototypal(JS)
+- Objects inherit fro object with a secret link to another object.
 
 ## DOM STUF WITH JS~~~
 
@@ -764,7 +807,7 @@ Invocation: Every call receives 'this' and args.
 
 ### Method Invocation
 
--When a function is stored as a property of an object, we call it a method. When a method is invoked, this is bound to that object. (when invocation contains a dot . )
+- When a function is stored as a property of an object, we call it a method. When a method is invoked, this is bound to that object. (when invocation contains a dot . )
 
 ```js
      var myObject = {
@@ -778,7 +821,7 @@ myObject.increment(2);// myObject.value => 3
 
 ### The Function Invocation
 
--When a function is not the property of an object, then it is invoked as a function:
+- When a function is not the property of an object, then it is invoked as a function:
 
 ```js
 var sum = add(3, 4);    // sum is 7
@@ -801,10 +844,10 @@ myObject.value(); // 6
 
 ### The Constructor Invocation Pattern **DO NOT USE THIS (new)**
 
--If a function is invoked with the *new* prefix, then a new object will be created with a hidden link to the value of the function’s prototype member, and this will be bound to that new object.
--Functions intended to use **new** prefix are called constructors.
--By convention, they are kept in variables with a capitalized name.
--*new* returns a new object with a pointer to the constructor's prototype
+- If a function is invoked with the *new* prefix, then a new object will be created with a hidden link to the value of the function’s prototype member, and this will be bound to that new object.
+- Functions intended to use **new** prefix are called constructors.
+- By convention, they are kept in variables with a capitalized name.
+- *new* returns a new object with a pointer to the constructor's prototype
 
 ```js
 // Create a constructor function called Quo. It makes an object with a status property.
@@ -848,8 +891,8 @@ A function always returns a value. If no return specified, it returns udefined.
 
 ### Public methods
 
--method that uses this to access an object
--can be reused with many 'classes'
+- method that uses this to access an object
+- can be reused with many 'classes'
 
 ```js
 function(string) { //can be used with any object
@@ -859,14 +902,14 @@ function(string) { //can be used with any object
 
 ### MOdule
 
--Varuables defined in a module are only visible in the module
--FUnctions can be used to contain modules
+- Varuables defined in a module are only visible in the module
+- FUnctions can be used to contain modules
 
 ### Singletons
 
--Objects instantiated *once*
--can be created with object notation
--Another way of writing a singleton.(using closures)
+- Objects instantiated *once*
+- can be created with object notation
+- Another way of writing a singleton.(using closures)
 
 ```js
 var singleton = function(){
@@ -885,7 +928,7 @@ singleton.firstmethod(1,2);
 
 ### Power Constructor
 
--using a singleton module pattern in a constructor and we have a power constructor
+- using a singleton module pattern in a constructor and we have a power constructor
 
 ```js
 function powerConstructor(){
@@ -1208,8 +1251,8 @@ cool guy tutorial videos: https://www.youtube.com/playlist?list=PL0zVEGEvSaeEd9h
 
 # Books
 
--Programming Javascript applications - Eric Elliot
--You Don't Know JS: Up & Going - Kyle Simpson
+- Programming Javascript applications - Eric Elliot
+- You Don't Know JS: Up & Going - Kyle Simpson
 
 # jsconf
 
