@@ -239,8 +239,9 @@ const Musician = {
   }
 };
 
-var Guitarist = Object.create(Musician, { strings: { value: 6 } } )
+var Guitarist = Object.create(Musician)
 Guitarist.sounds = ['Twang', 'Thrumb', 'Bling'],
+Guitarist.strings = 6;
 Guitarist.tune = function() {
     console.log('Be with you in a moment, tuning');
 };
