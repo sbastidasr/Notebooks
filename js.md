@@ -285,6 +285,46 @@ for(var prop in user){
 
 
 
+**Bind**
+
+`bind` creates a new function with the same body but with `this` and some arguments predefined. It is usually used when you want to pass a function to an event handler or other async callback. It doesn't change the original function.
+
+```javascript
+var add = function(a, b) { return a + b };
+var addFive = add.bind(null, 5);
+console.log(addFive(3)); // 8
+```
+
+
+
+**Apply / Call**
+
+Both set the first function's this to the fisrt argument (can be set to null) and then pass any other arguments to the rest of the function.
+
+**Call** calls the function with the specified arguments.
+
+**Apply** calls the function with args specified in an array. 
+
+```js
+function speak(line) {
+  console.log("The " + this.type + " rabbit says '" + line + "'");
+}
+var fatRabbit = {type: "fat", speak: speak};
+
+speak.apply(fatRabbit, ["Burp!"]); // → The fat rabbit says 'Burp!'
+speak.call({type: "old"}, "Oh my."); // → The old rabbit says 'Oh my.'
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 # NOT YET DONE 
@@ -394,26 +434,6 @@ console.log(ancestry.reduce(function(min, cur) {
   if (cur.born < min.born) return cur;
   else return min;
 }));
-```
-
-**Bind**
-
-The bind method, which all functions have, creates a new function that will call the original function but with some of the arguments already fixed.
-
-**Apply / Call**
-
-Passes the first argument to the function's this.
-
-```js
-function speak(line) {
-  console.log("The " + this.type + " rabbit says '" + line + "'");
-}
-var fatRabbit = {type: "fat", speak: speak};
-
-speak.apply(fatRabbit, ["Burp!"]);
-// → The fat rabbit says 'Burp!'
-speak.call({type: "old"}, "Oh my.");
-// → The old rabbit says 'Oh my.'
 ```
 
 **Getters and setters**
@@ -905,7 +925,7 @@ document.writeln(myQuo.get_status()); // Get method from he constructor prototyp
 
 functions can have methods.
 
-The apply method lets us construct an array of arguments to use to invoke a func- tion. It also lets us choose the value of this. The apply method takes two parame- ters. The first is the value that should be bound to this. The second is an array of parameters.
+The apply method lets us construct an array of arguments to use to invoke a function. It also lets us choose the value of this. The apply method takes two parame- ters. The first is the value that should be bound to this. The second is an array of parameters.
 
 ```js
 // Make an array of 2 numbers and add them.
