@@ -26,26 +26,31 @@ printArgsArray(1, 3, 5) // 9
 
 ### Function Invocation + This
 
-Function invocation is the calling of a function. There are many ways of calling a function, and the way of invoking it defines the contents of `this`. It is an abstract keyword meaning the object we are talking about. It is defined at the time of the call of the function. To test all the functions we'll be using
+Function invocation is the calling of a function. There are many ways of calling a function, and the way of invoking it defines the contents of `this`. It is a placeholder for the current object. It is defined at the time of the call of the function. 
 
-```javascript
-sayThis(){ 
-  console.log(this) 
-}
+```javascript 
+var alien {
+	name: "Mark",
+	sayHi : function(){
+    	return "Hi, my name is: " + this.name;
+    } 
+ }
+ alien.sayHi(); // Hi, my name is: Mark
 ```
 
 
 
 **1. Function Form**
 
-If a function is ran alone, `this` will be assigned to the global variable. If we call the sayThis function like this `sayThis();`, the global object will be the this, which is not very useful, and it will be printed in the console.
+If a function is ran alone, `this` will be assigned to the global variable. If we call the sayThis function
 
-```js
-functionObject(args)
+```javascript
+sayThis(){ console.log(this) }
 ```
 
-- this is set to the global obj, not very useful
+using `sayThis();`, the global object will be the this, which is not very useful, and it will be printed in the console. This is set to the global obj, not very useful
 
+*Self = this*
 
 This pattern can have unpredictable behavior with helper functions because they don't have access to outer this. So, we use `var self = this` in the inner function;
 
@@ -105,44 +110,13 @@ speak.call({type: "old"}, "Oh my."); // → The old rabbit says 'Oh my.'
 
 
 
-## Augmenting Built in types.
-
-- For example add **trim** to string
-
-```js
-  String.prototype.trim = function () {
-    return this.replace(
-      /^s*(S*(s+S+)*)s*$/, "$1");
-  }
-```
-
-**Augmenting Strings**
-
-```js
-var data = {
-  name: 'Carl',
-  state: 'Happy'
-};
-var template = 'someone named {name} is {state}'
-var myStr = template.supplant(data);
-
-String.prototype.supplant = function(o) {
-  return this.replace(/{([^{}]*)}/g,function(a, b) {
-    var r = o[b];
-    return typeof r === 'string' || typeof r === 'number' ? r : a;
-  });
-};
-```
-
-
-
-
-
 ## Objects
 
 - Evertything on JS is an object, except null and undefined. Including numbers ```(2).toString();```
 - Objects have properties ``` foo.1234; // SyntaxErrorfoo```   ```['1234']; // works ```
-- **delete** is the only way to remove properties. Setting them to ```null``` or ```undefined``` maintains the property with that value.
+- **delete** is the only way to remove properties. Setting them to ```null``` or ```undefined``` maintains the property with ```null``` or ```undefined``` instead of making the object not have that property.
+- There's no equality on objects. Doing ```===``` only checks if references to the same object (pointers) are the same. 
+- Objects are passed by ref.
 
 ### Prototype
 
@@ -393,7 +367,6 @@ nigel.tune(); // "Be with you in a moment, tuning"
 
 
 ```
-
 ### Factory functions
 
 Functions that return an object. consts are encapsulated by closure. Only talk is available, and it has access to sound. Sound is not available. 
@@ -430,22 +403,34 @@ for(var prop in user){
 
 # NOT YET DONE 
 
-### This
+## Augmenting Built in types.
 
-```this``` is a placeholder for the current object. Running it on **Methods** will get the 
+- For example add **trim** to string
 
-```javascript 
-var alien {
-	name: "Mark",
-	sayHi : function(){
-    	return "Hi, my name is: " + this.name;
-    } 
-// Returs Hi, my name is: Mark
+```js
+  String.prototype.trim = function () {
+    return this.replace(
+      /^s*(S*(s+S+)*)s*$/, "$1");
+  }
 ```
 
+**Augmenting Strings**
 
+```js
+var data = {
+  name: 'Carl',
+  state: 'Happy'
+};
+var template = 'someone named {name} is {state}'
+var myStr = template.supplant(data);
 
-**
+String.prototype.supplant = function(o) {
+  return this.replace(/{([^{}]*)}/g,function(a, b) {
+    var r = o[b];
+    return typeof r === 'string' || typeof r === 'number' ? r : a;
+  });
+};
+```
 
 
 
@@ -634,63 +619,7 @@ myObject = maker('Jack', 2);
 
 ## 
 
-## Prototyal inheritance
 
-**Linkage** Greater expressive power, different than classes.
-
-- Objects can have a link to aother object.
-- If an attempt to access a name fails, the link will be used to the old object.
-- NOT used for storing. Only stores on the primary obeject.
-- So you make objects similar to existing objects, and then customized
-- YOu can chain many objects, Object.prototype is always the last.
-- hasOwnProperty() //is it a member of the object
-
-```js
-myOldObject.level=3;
-var myNewObject = object(myOldObject) //inherits from myOldObject
-//myNewObject points to myOldObject
-
-myNewObject.level+=1; //new object doesnt have level.
-//so it takes level from oldObject
-// But always stores in the current one, not on the parent.
-```
-
-
-
-```js
-object(o); //makes an empty objet with a link to o
-
-function object(o){
-  function F() {}
-    F.prototype = o;
-    return new F();
-}
-newObject = object(oldObject)
-```
-
-- augmenting yhr prototype augments all its objects
-- but changes to obkects will not go back to the prototype
-
-# inheritance
-
-- Constructor Functions
-- new operator
-- prototype member
-
-# ~object.prototype HAS to point to another object.... from which it inherits
-
-**object Properties**
-
-- No equality on objects!!!!
-- Only check references to the same object(pointers) === true if are the same
-- passed by ref.
-- delete myObj[name]//changes it to undef.
-
-### Ways og Object construction
-
-- new Object()
-- {} //preferred
-- object(object.prototype)
 
 ## arrays
 
@@ -784,15 +713,7 @@ var trivia = YAHOO.Trivia();
 
 -patterns enclosed in slashes
 
-## inheritance.
 
-- Object oriented code reduce
-- two schools: Classical(JAva) Prototypal(JS)
-- Objects inherit fro object with a secret link to another object.
-
-## DOM STUF WITH JS~~~
-
-document.getElementbyId(id)
 
 # End Douglas
 
