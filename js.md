@@ -1,5 +1,143 @@
 # Javascript
 
+## Functions
+
+- Functions are first class objects. Meaning functions are objects as much as arrays or numbers and they work like any other value. And even though functions are objects, we'll review functions first as they will help understand some of the concepts of objects. 
+- Inherit from object, can store name value pairs
+- Called lambda in other languages.
+- Inner functions have access to the params of the functions it is contained in. This is called **Static Scoping**
+- Functions are **closures**, meaning the function still has access to the parent's values, even if the parent doesn't exist anymore (has already returned). The values on functions are references, **not copies of values**
+
+
+#### Invocation: Arguments
+
+- functions receive parameters called arguments
+- Functions contain invocation args in an array-like object with length.
+
+```js
+function printArgsArray(a, b, c){
+  console.log(arguments) // [1, 3, 5]
+  console.log(b) // 2
+}
+printArgsArray(1, 3, 5) // 9
+```
+
+
+
+### Function Invocation + This
+
+Function invocation is the calling of a function. There are many ways of calling a function, and the way of invoking it defines the contents of `this`. It is an abstract keyword meaning the object we are talking about. It is defined at the time of the call of the function. To test all the functions we'll be using
+
+```javascript
+sayThis(){ 
+  console.log(this) 
+}
+```
+
+
+
+**1. Function Form**
+
+If a function is ran alone, `this` will be assigned to the global variable. If we call the sayThis function like this `sayThis();`, the global object will be the this, which is not very useful, and it will be printed in the console.
+
+```js
+functionObject(args)
+```
+
+- this is set to the global obj, not very useful
+
+
+This pattern can have unpredictable behavior with helper functions because they don't have access to outer this. So, we use `var self = this` in the inner function;
+
+```javascript
+function SeatReservation(name, initialMeal) {
+    var self = this;
+    self.name = name;
+    self.meal = ko.observable(initialMeal);
+    setTimeout(function () { alert(self.name) }, 100);
+} // otherwise, this is window in setTimeout.
+```
+
+**2. Method Form**
+
+A method is a function that is assiociated to an object. Like method speak on a `Cat` instance: `myCat.speak()`.It will be the object on which the function is being called upon. `myCat.speak() // "meow"` this inside `speak()` will be `myCat`.
+
+**3. Constructor Form**
+
+A constructor (considered like a `class` alternative in JS) is a function that creates objects. Inside a constructor called with the keyword `new`, `this` is the newly created instance.
+
+```js
+new functionObject(args)
+```
+
+- A new object is created and assigned to this. 
+- if no return is especified, this will be returned.
+
+**4. Bind + Apply + Call**
+
+**Bind**
+
+`bind` copies the function with the same body but with `this` and some arguments predefined. It is usually used when you want to pass a function to an event handler or other async callback. It doesn't change the original function.
+
+```javascript
+var add = function(a, b) { return a + b };
+var addFive = add.bind(null, 5);
+console.log(addFive(3)); // 8
+```
+
+**Apply / Call**
+
+Both set the first function's this to the fisrt argument (can be set to null) and then pass any other arguments to the rest of the function.
+
+**Call** calls the function with the specified arguments.
+
+**Apply** calls the function with args specified in an array. 
+
+```js
+function speak(line) {
+  console.log("The " + this.type + " rabbit says '" + line + "'");
+}
+var fatRabbit = {type: "fat", speak: speak};
+
+speak.apply(fatRabbit, ["Burp!"]); // → The fat rabbit says 'Burp!'
+speak.call({type: "old"}, "Oh my."); // → The old rabbit says 'Oh my.'
+```
+
+
+
+## Augmenting Built in types.
+
+- For example add **trim** to string
+
+```js
+  String.prototype.trim = function () {
+    return this.replace(
+      /^s*(S*(s+S+)*)s*$/, "$1");
+  }
+```
+
+**Augmenting Strings**
+
+```js
+var data = {
+  name: 'Carl',
+  state: 'Happy'
+};
+var template = 'someone named {name} is {state}'
+var myStr = template.supplant(data);
+
+String.prototype.supplant = function(o) {
+  return this.replace(/{([^{}]*)}/g,function(a, b) {
+    var r = o[b];
+    return typeof r === 'string' || typeof r === 'number' ? r : a;
+  });
+};
+```
+
+
+
+
+
 ## Objects
 
 - Evertything on JS is an object, except null and undefined. Including numbers ```(2).toString();```
@@ -254,11 +392,13 @@ nigel.tune(); // "Be with you in a moment, tuning"
 
 
 
+```
+
 ### Factory functions
 
 Functions that return an object. consts are encapsulated by closure. Only talk is available, and it has access to sound. Sound is not available. 
 
-```js
+​```js
 const dog = () => {
   const sound = 'woof'
   return {
@@ -283,46 +423,6 @@ for(var prop in user){
    console.log(user[prop]); // Brendan Eich programmer JavaScript
 }
 ```
-
-
-
-**Bind**
-
-`bind` creates a new function with the same body but with `this` and some arguments predefined. It is usually used when you want to pass a function to an event handler or other async callback. It doesn't change the original function.
-
-```javascript
-var add = function(a, b) { return a + b };
-var addFive = add.bind(null, 5);
-console.log(addFive(3)); // 8
-```
-
-
-
-**Apply / Call**
-
-Both set the first function's this to the fisrt argument (can be set to null) and then pass any other arguments to the rest of the function.
-
-**Call** calls the function with the specified arguments.
-
-**Apply** calls the function with args specified in an array. 
-
-```js
-function speak(line) {
-  console.log("The " + this.type + " rabbit says '" + line + "'");
-}
-var fatRabbit = {type: "fat", speak: speak};
-
-speak.apply(fatRabbit, ["Burp!"]); // → The fat rabbit says 'Burp!'
-speak.call({type: "old"}, "Oh my."); // → The old rabbit says 'Oh my.'
-```
-
-
-
-
-
-
-
-
 
 
 
@@ -532,9 +632,7 @@ function maker(name, grade){
 myObject = maker('Jack', 2);
 ```
 
-------
-
-## ~~~~~maybe move this to Object contstuctor
+## 
 
 ## Prototyal inheritance
 
@@ -619,107 +717,6 @@ newObject = object(oldObject)
 ```js
 myarr=['a','b','c','d'];
   myarr.splice(1,1); //['a','c','d']
-```
-
-## Functions
-
-- First class objects.
-- work like any other value
-- inherit from object, can store name value pairs
-- Called lambda in other languages.
-- It is secure.
-- **Static Scoping** Inner functions have access to the params of the functions it is contained in.
-- **closure** The variable still have access to the parents values, even if the parent doesn't exist anymore (has returned); has access to it, IS NOT A COPY.
-
-Each function has it's own scope. Are local vars to the function. (meaning that multiple calls to the same method will not mess with each other.)
-
-**Static Vars on Functions**
-
-?????????
-
-### Function Invocation.
-
-- 'this' is bound at invocation time.
-
-**Function Form**
-
-```js
-functionObject(args)
-```
-
-- this is set to the global obj.
-- not very useful
-- makes it harder to write helper functions within a method because it doesn't have access to outer this.
-- use *var that = this; *in the inner.
-
-**Method Form**
-
-```js
-  thisObject.MethodName(args)
-  thisObject["MethodName"](args)
-```
-
-- this on the function will be a reference to thisObject
-
-**Constructor Form**
-
-```js
-new functionObject(args)
-```
-
-- A new object is created and assigned to this. 
-- if no return is especified, this will be returned.
-
-**Apply Form**
-
-```js
-functionObject.aply(thisObject, [args])
-```
-
-- ```
-
-  ```
-
-#### Invocation: Arguments
-
-- functions also receive a parameter called arguments
-- contains invocation args in an array-like object with length.
-
-```js
-function sum(){
-  arguments.length;
-  add all in arguments array
-  return total
-}
-```
-
-## Augmenting Built in types.
-
-- For example add **trim** to string
-
-```js
-  String.prototype.trim = function () {
-    return this.replace(
-      /^s*(S*(s+S+)*)s*$/, "$1");
-  }
-```
-
-**Augmenting Strings**
-
-```js
-var data = {
-  name: 'Carl',
-  state: 'Happy'
-};
-var template = 'someone named {name} is {state}'
-var myStr = template.supplant(data);
-
-String.prototype.supplant = function(o) {
-  return this.replace(/{([^{}]*)}/g,function(a, b) {
-    var r = o[b];
-    return typeof r === 'string' || typeof r === 'number' ? r : a;
-  });
-};
 ```
 
 ## typeof
