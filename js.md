@@ -231,6 +231,18 @@ When adding properties or methods to objects, there are two ways to do it. All p
 
 Adding the methods via `Foo.prototype.run = function(){ console.log("run!") }  ` adds the method to the prototype and thus, is shared by all instances. This occupies less memory and is faster. 
 
+**problem with new**
+
+```js
+class Dog {
+  constructor() { this.sound = 'woof' }
+  talk() { console.log(this.sound) }
+}
+const sniffles = new Dog()
+sniffles.talk() // "woof"
+$('button.myButton').click(sniffles.talk) //outputs stuff you dont want
+```
+
 
 
 ### Object.create()    [Personal favorite, when possible]
@@ -322,7 +334,7 @@ Dog.prototype.bark = function () { /* ... */ };
 
 // 2. level constructor
 var TrainedDog = function ( name, level ) {
-    Dog.apply( this, arguments ); // calling the super constructor
+    Dog.apply( this, arguments ); // calling the super constructor with same this + args.
     this.level = level;
 };
 
@@ -364,25 +376,38 @@ console.log(nigel.strings) // 6
 nigel.tune(); // "Be with you in a moment, tuning"
 ```
 
-
-
-```
 ### Factory functions
 
-Functions that return an object. consts are encapsulated by closure. Only talk is available, and it has access to sound. Sound is not available. 
+Functions that return an object. Variables are encapsulated by a closure, they become private. So they
 
-​```js
-const dog = () => {
+- Have no leakage -> they only show what we want to return.
+- makes all vars private.
+- Also called **maker functions** or power constructors
+- This is always bound correctly. 
+
+Only talk is available, and it has access to sound. Sound is not available. 
+
+```javascript
+const dog = (age) => {
   const sound = 'woof'
   return {
-    talk: () => console.log(sound)
+    talk: () => console.log(sound),
+    age: age
   }
 }
-const sniffles = dog()
+const sniffles = dog(2)
 sniffles.talk() // Outputs: "woof"
 ```
 
-### 
+
+
+### object.assign ?????
+
+Takes an object and assigns the properties of the other passed objects
+
+object.assign({}, meower(state)) 
+
+
 
 ###Looping through Objects
 
@@ -407,7 +432,7 @@ for(var prop in user){
 
 - For example add **trim** to string
 
-```js
+​```js
   String.prototype.trim = function () {
     return this.replace(
       /^s*(S*(s+S+)*)s*$/, "$1");
@@ -416,7 +441,7 @@ for(var prop in user){
 
 **Augmenting Strings**
 
-```js
+​```js
 var data = {
   name: 'Carl',
   state: 'Happy'
@@ -450,16 +475,6 @@ Examples of functors: map
 
 Promises in JS ES6 implement Flatmap, but called .then, bind, chain.
 
-Ways of instantiating an object:
-
-- Factories(DEFAULT): Functions that create and return objects
-- More flexible and easier
-- Have private properties
-- Don't use this
-- Prototypes
-- Better performance
-- Less memory
-- Class: instanciate with new (fast but dont use because this is not correctly bound)
 
 
 
@@ -583,7 +598,7 @@ var last = input || nr_items;
 
 **strings** are immutable
 
-**false** values
+**false** values (not objects?)
 
  undefined (not defined or can be set as undefined )
 
@@ -597,27 +612,7 @@ var last = input || nr_items;
 
  ""
 
-- everything else is objects
 
-**Objects** An object is a hashtable (name, value) pairs
-
-return; retue=rns undefined.
-
-constructors will return this.
-
-**maker function**
-
-```js
-function maker(name, grade){
-  var it = {};
-  it.name=name;
-  it.grade=grade;
-  return it;  
-}
-myObject = maker('Jack', 2);
-```
-
-## 
 
 
 
@@ -690,26 +685,9 @@ eval(string)
 - vars without var are global.
 - Create ONE global object and place everything there.
 
-## Encapsulation
 
-- Has no leakage
-- Only shows what we want to return.
-- Uses closures
-- makes all vars private.
 
-```js
-YAHOO.Trivia = function () {
-  //define common vars & functions here
-  return {
-    getNextPoster: function (cat,diff){   /* ...Stuff..  */}
-    showPoser: function () {   /* ...Stuff..  */}
-    }
-}
-var trivia = YAHOO.Trivia();
-}
-```
-
-### RegExp
+#### RegExp
 
 -patterns enclosed in slashes
 
@@ -903,25 +881,9 @@ var singleton = function(){
 singleton.firstmethod(1,2);
 ```
 
-### Power Constructor
 
-- using a singleton module pattern in a constructor and we have a power constructor
 
-```js
-function powerConstructor(){
-  var that=object(oldObject); //or use that={};
-  var privateVar;
-  function provateFunc(){};
-  //Privileged methods, gettes, setters etc.
-  that.firstmethod: function(a,b){
-      //dostuff with private var & function  
-  }
-  return that;
-}
-myObject=power_constructor();
-```
-
-**Functions in Loops**
+Functions in Loops**
 
 When assigning functions in a loop, all will be bound to the same closure.
 
@@ -987,7 +949,7 @@ var totalAmount = orders.reduce( function(sum, order) {
 //totalAmount=>650
 ```
 
-## 3promises
+## promises
 
 Dealing with asyinc callbacks.
 
@@ -1009,7 +971,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 
 **pure functions**
 
-**Call+apply**
+
 
 **assign**
 
@@ -1017,66 +979,15 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 
 **Inheritance:** modeled around what they are
 
-**Factories:** Function that create objects and return the. Simpler than classes.
-
-#### classes DO NOT USE
-
-```js
-class Dog {
-  constructor() {
-    this.sound = 'woof'
-  }
-  talk() {
-    console.log(this.sound)
-  }
-}
-const sniffles = new Dog()
-sniffles.talk() // Outputs: "woof"
-$('button.myButton').click(sniffles.talk) //outputs stuff you dont want
-```
-
-#### Factories USE
-
-```js
-const dog = () => {
-  const sound = 'woof',
-  return {
-    talk: () => console.log(sound)
-  }
-}
-const sniffles = dog()
-sniffles.talk() // Outputs: "woof"
-```
-
-favor composition over inheritance
-
-### Composition
-
-Designing types around what they do
-
-Composition example [here](moarCode/compositionExample.md)
-
-### Inheritance
-
-Designing types around what they are
-
-You get the object but also a lot of extra stuff you dont need
-
-**object.assign({}, meower(state)) **
-
-Takes an object and assigns the properties of the other passed objects
-
 **currying** Function that takes arguments. Uses the first arg and returns a new function and calls it with the secnd arg and so on.
 
-**lodash**
-
-**Bind**
+**
 
 ------
 
 ## Don't Use
 
-**new** Use **create**
+
 
 **for** or **for in** because order is not known. Use: **for each**
 
@@ -1092,7 +1003,7 @@ JsLint
 
 ------
 
-------
+
 
 ## Angular.js
 
@@ -1230,27 +1141,4 @@ cool guy tutorial videos: https://www.youtube.com/playlist?list=PL0zVEGEvSaeEd9h
 
 - Programming Javascript applications - Eric Elliot
 - You Don't Know JS: Up & Going - Kyle Simpson
-
-# jsconf
-
-# STUFF YOU SHOULDN'T USE
-
-## Constructor functions
-
-Start with capital letter and create instances with new
-
-The new object’s prototype will be the object found in the prototype property of the constructor function.
-
-```js
-function Rabbit(type) {
-  this.type = type;
-}
-var blackRabbit = new Rabbit("black");
-console.log(blackRabbit.type);  // → black
-
-Rabbit.prototype.speak = function(line) {
-  console.log("The " + this.type + " rabbit says '" + line + "'");
-};
-blackRabbit.speak("Doom..."); // → The black rabbit says 'Doom...'
-```
 
