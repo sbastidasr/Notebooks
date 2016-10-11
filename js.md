@@ -28,7 +28,7 @@ printArgsArray(1, 3, 5) // 9
 
 Function invocation is the calling of a function. There are many ways of calling a function, and the way of invoking it defines the contents of `this`. It is a placeholder for the current object. It is defined at the time of the call of the function. 
 
-```javascript 
+```javascript
 var alien {
 	name: "Mark",
 	sayHi : function(){
@@ -56,7 +56,7 @@ function add(a, b){
 
 *Self = this*
 
-This pattern can have unpredictable behavior with helper functions because they don't have access to outer this. So, we use `var self = this` in the inner function;
+The Function pattern can have unpredictable behavior with helper functions because they don't have access to outer this. So, we use `var self = this` in the inner function;
 
 
 
@@ -423,29 +423,6 @@ const dog = (age) => {
 }
 const sniffles = dog(2)
 sniffles.talk() // Outputs: "woof"
-```
-
-
-
-### object.assign ?????
-
-Takes an object and assigns the properties of the other passed objects
-
-object.assign({}, meower(state)) 
-
-
-
-###Looping through Objects
-
-```javascript
-var user = {
-  name:"Brendan Eich",
-  profession:"programmer",
-  invented:"JavaScript"
-};
-for(var prop in user){
-   console.log(user[prop]); // Brendan Eich programmer JavaScript
-}
 ```
 
 

@@ -1,3 +1,26 @@
+### object.assign
+
+Takes an object and assigns the properties of the other passed objects
+
+object.assign({}, meower(state)) 
+
+
+
+### Looping through Objects
+
+```javascript
+var user = {
+  name:"Brendan Eich",
+  profession:"programmer",
+  invented:"JavaScript"
+};
+for(var prop in user){
+   console.log(user[prop]); // Brendan Eich programmer JavaScript
+}
+```
+
+
+
 
 
 
