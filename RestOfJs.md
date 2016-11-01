@@ -663,3 +663,188 @@ cool guy tutorial videos: https://www.youtube.com/playlist?list=PL0zVEGEvSaeEd9h
 - You Don't Know JS: Up & Going - Kyle Simpson
 
 
+
+
+
+
+## Steams
+
+Pipes move data from one program to another.
+
+    var stream = fs.createReadStream(__dirname + '/data.txt');
+    //stream.pipe(res);
+   stream.pipe(oppressor(req)).pipe(res); //double piping to compress and repsond
+
+
+##pipe 
+.pipe() is just a function that takes a readable source stream src and hooks the output to a destination writable stream dst:
+
+src.pipe(dst)
+
+`.pipe(dst)` returns `dst` so that you can chain together multiple `.pipe()` calls together:
+
+```
+a.pipe(b).pipe(c).pipe(d)
+```
+
+which is the same as:
+
+```
+a.pipe(b);
+b.pipe(c);
+c.pipe(d);
+```
+
+
+
+
+
+## Promises
+
+```
+
+
+Tre
+
+```
+
+
+
+Real setTimeout example
+
+```javascrip
+var timer = new Promise(function(resolve, reject) { 
+	// A mock async action using setTimeout
+	setTimeout(function() { resolve(10); }, 3000);
+})
+ß
+timer
+.then(function(num) { console.log('first then: ', num); return num +10; })
+.then(function(num) { console.log('second then: ', num); return num +10; })
+.then(function(num) { console.log('last then: ', num);});
+
+// From the console:
+// first then:  10
+// second then:  20
+// last then:  30
+
+```
+
+
+
+Catch Example
+
+```javascript
+new Promise(function(resolve, reject) {
+	// A mock async action using setTimeout
+	setTimeout(function() { reject('rejectvalue!'); }, 3000);
+})
+.then(function(e) { console.log('done', e); })
+.catch(function(e) { console.log('catch: ' + e); });
+
+/*SAME AS DOING*/
+.then(
+  function(e) { console.log('done', e); }, 
+  function(e) { console.log('catch: ' + e); }
+);
+
+// From the console:
+// 'catch: Done!'
+
+
+```
+
+
+
+
+
+Promises 2.0 
+
+```javascript
+// ES6
+function printAfterTimeout(string, timeout){
+  return new Promise((resolve, reject) => {
+    setTimeout(function(){
+      resolve(string);
+    }, timeout);
+  });
+}
+printAfterTimeout('Hello ', 2e3).then((result) => {
+  console.log(result);
+  return printAfterTimeout(result + 'Reader', 2e3);
+}).then((result) => {
+  console.log(result);
+});
+```
+
+
+
+# Awesome ES6 Features
+
+## Arrow functions
+
+```javascript
+//ES6
+$('.btn').click((event) =>  this.sendData()); // this will reference the outer this
+// implicit returns
+const ids = [291, 288, 984];
+const messages = ids.map(value => `ID is ${value}`);
+
+```
+
+
+
+### Iterating through arrays ES6 
+
+```javascript
+// ES6
+const array = ['a', 'b', 'c', 'd'];
+for (const element of array) {
+    console.log(element);
+}
+```
+
+
+
+### Default Params
+
+```javascript
+ES6
+
+function point(x = 0, y = -1, isFlag = true){
+  console.log(x,y, isFlag);
+}
+point(0, 0) // 0 0 true
+point(0, 0, false) // 0 0 false
+point(1) // 1 -1 true
+point() // 0 -1 true
+```
+
+### Rest Operator
+
+```javascript
+// ES6
+function printf(format, ...params) {
+  console.log('params: ', params);
+  console.log('format: ', format);
+}
+printf('%s %d %.2f', 'adrian', 321, Math.PI);
+
+```
+
+### Spread Operator
+
+```javascript
+Math.max(...[2,100,1,6,43]) // 100
+```
+
+
+
+
+
+Promise.then()
+
+- calls either successs or reject after completing the work(kinda like the callbacks)
+- You can return values from callbacks and chain them to other promises
+- YOu can apass error handling fungi\tion on the las call
+- ​

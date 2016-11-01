@@ -271,6 +271,45 @@ $('button.myButton').click(sniffles.talk) //outputs stuff you dont want
 
 
 
+### Constructors + new + self Invoking functions -beautiful-
+
+```javascript
+var Animal = (function () {
+  function MyConstructor(name) {
+    this.name = name;
+  }
+  MyConstructor.prototype.speak = function speak() {
+    console.log(this.name + ' makes a noise.');
+  };
+  return MyConstructor;
+})();
+var animal = new Animal('animal');
+animal.speak(); // animal makes a noise.
+```
+
+#### Inheritance with SIIF -beautiful-
+
+```javascript
+var Lion = (function () {
+  function MyConstructor(name){
+    Animal.call(this, name);
+  }
+  // prototypal inheritance
+  MyConstructor.prototype = Object.create(Animal.prototype);
+  MyConstructor.prototype.constructor = Animal;
+  MyConstructor.prototype.speak = function speak() {
+    Animal.prototype.speak.call(this);
+    console.log(this.name + ' roars 🦁');
+  };
+  return MyConstructor;
+})();
+var lion = new Lion('Simba');
+lion.speak(); // Simba makes a noise.
+// Simba roars.
+```
+
+
+
 ### Object.create()    [Personal favorite, when possible]
 
 `Object.create` builds an object that inherits directly from the object passed as its first argument. Meaning that to create an object based on a Constructor prototype, you would do `Object.create(Car.prototype)` which is the same as  ```var redCar = new Car();```  You can create an object that doesn't inherit from anything with `Object.create(null);`
@@ -425,4 +464,22 @@ const sniffles = dog(2)
 sniffles.talk() // Outputs: "woof"
 ```
 
+
+
+### Classes and constructors in ES6 -beautiful- 
+
+```javascript
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(this.name + ' makes a noise.');
+  }
+}
+const animal = new Animal('animal');
+animal.speak(); // animal makes a noise.
+```
+
+#### Inheritance in ES7 -beautiful-
 
